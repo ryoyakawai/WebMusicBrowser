@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Web Music Browser</string>
+    <string name="urlbar_hint">Type URL</string>
+    <string name="menu_title1">Menu 1</string>
+    <string name="menu_title2">Menu 2</string>
+    <string name="settings_toolbar_title">Settings</string>
+    <string name="settings_general_tab">Coming Soon.</string>
+    <string name="settings_blemidi_tab">Coming Soon.</string>
+</resources>

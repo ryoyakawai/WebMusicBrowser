@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Web Music Browser</string>
+
+    <string name="top_text">Press to Play Sound</string>
+    <string name="clock">[Clock]</string>
+    <string name="motion">[Motion]</string>
+    <string name="play_sound">Play Sound</string>
+
+    <string name="init_title">Initial Title</string>
+    <string name="init_values">Initial Values</string>
+</resources>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#757575</color>
+    <color name="colorPrimaryDark">#424242</color>
+    <color name="colorAccent">#BDBDBD</color>
+    <color name="main_toolbar_background">#fafafa</color>
+    <color name="main_more_vert">#757575</color>
+    <color name="settings_toolbar_background">#263238</color>
+    <color name="settings_back_icon">#ffffff</color>
+    <color name="settings_toolbar_title">#ffffff</color>
+</resources>

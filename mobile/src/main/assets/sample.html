@@ -1,0 +1,100 @@
+<html>
+  <head>
+    <style>
+    h1{margin-bottom:3px; margin-top:6px}
+    h2{margin-bottom:3px; margin-top:6px}
+    .bh{height:60px; border-radius:3px}
+    .iparea{display:inline-block; vertical-align: top; height:60px}
+    .buarea{display:inline-block; vertical-align: top; height:60px; margin-left:5px;}
+    .targetip{font-size:28px; border-radius:3px; border:1px solid #eee; padding: 3px 8px; width:190px}
+    .arguments{font-size:28px; border-radius:3px; border:1px solid #eee; padding: 3px 8px;  width:200px}
+    .btdiv{margin-bottom:3px;}
+    .dumparea{border-radius:3px; border:1px solid #eee; padding: 3px; width:100%}
+    </style>
+  </head>
+  <body>
+    <h1>Web OSC</h1>
+    <p id="ipaddr"></p>
+    <h2>Client</h2>
+    <div>
+      <div class="iparea">
+        Target IP:<br>
+        <input type="text" id="targetip" class="targetip">
+      </div>
+      <div class="buarea">
+        <button id="setClient" class="bh" >Set Target</button>
+      </div>
+    </div>
+    <br>
+    <div>
+      <div class="iparea">
+        Argunents:<br>
+        <input type="text" id="arguments" class="arguments" value="WebOSC TEST">
+      </div>
+      <div class="buarea">
+    <button id="sendMessage" class="bh" disabled>Send Message</button>
+      </div>
+    </div>
+
+    <hr size="1" color="#ddd" noshade>
+
+    <h2>Server</h2>
+    <div class="btdiv">
+      <button id="startserver" class="bh">Start Server</button>
+    </div>
+    <textarea id="dumpText" rows="10" class="dumparea"></textarea>
+    <!--<div id="dump" class="dumparea"></div>-->
+
+    <script type="text/javascript" src="./js/webosc.js"></script>
+    <script type="text/javascript">
+    var oscObj;
+    navigator.requestOSCAccess().then(successCallback, errorCallback);
+    function successCallback(access) {
+        oscObj=access;
+
+        var deviceIP;
+        deviceIP=oscObj.getIPAddress();
+        document.getElementById("ipaddr").innerHTML="Local IP: "+ deviceIP;
+        document.getElementById("targetip").setAttribute("value", deviceIP);
+
+        document.getElementById("setClient").addEventListener("mousedown", function(event){
+            var targetIP=document.getElementById("targetip").value;
+            oscObj.setClient(targetIP, 10000);
+            document.getElementById("sendMessage").removeAttribute("disabled");
+            document.getElementById("setClient").setAttribute("disabled", "disabled");
+            document.getElementById("targetip").setAttribute("disabled", "disabled");
+        });
+        document.getElementById("sendMessage").addEventListener("mousedown", function(event){
+            var date=new Date();
+            var ddate=date.getFullYear() + "/" + (date.getMonth()+1) + "/" + date.getDate() 
+            + "_" + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds(); 
+            var ddate1=(date.getMonth()+1) + "/" + date.getDate() 
+            + "_" + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds(); 
+            var arguments=document.getElementById("arguments").value;
+            var values={"addrPattern":"/hogehoge", "arguments":[arguments]};
+            console.log(values);
+            oscObj.send(JSON.stringify(values));
+        });
+        document.getElementById("startserver").addEventListener("mousedown", function(event){
+            oscObj.setServer(10000, "/hogehoge");
+            oscObj.startServer();
+            document.getElementById("startserver").setAttribute("disabled", "disabled");
+        });
+        document.addEventListener("onoscmessage", function(event){
+            var received = document.getElementById("dumpText").innerHTML;
+            console.log(received);
+            var arrayReceived = [];
+            if(received!="") {
+                arrayReceived = (received.split("\n")).reverse();
+            }
+            arrayReceived.push(event.detail.addrPattern + " " + event.detail.arguments);
+            document.getElementById("dumpText").innerHTML=(arrayReceived.reverse()).slice(0, 9).join("\n");
+        });
+    }
+    function errorCallback(msg) {
+        console.error(msg);
+    }
+
+    </script>
+  </script>
+</html>

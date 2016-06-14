@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/more_vert_settings_refresh"
+        android:title="Refresh"
+        android:icon="@drawable/ic_refresh_black_24dp"
+        android:showAsAction="ifRoom|withText" />
+
+    <item android:id="@+id/more_vert_settings_setting"
+        android:title="Settings"
+        android:icon="@drawable/ic_setting_light"
+        android:showAsAction="always|withText" />
+
+    <item android:id="@+id/intent_qrcodereader"
+        android:title="QR Code Reader"
+        android:icon="@drawable/icon_qacode"
+        android:showAsAction="ifRoom|withText" />
+
+    <!--
+        <item android:id="@+id/ddd"
+            android:title="DDD"
+            android:icon="@drawable/ic_refresh_black_24dp"
+            android:showAsAction="ifRoom|withText" />
+
+        <item android:id="@+id/eee"
+            android:title="EEE"
+            android:icon="@drawable/ic_refresh_black_24dp"
+            android:showAsAction="ifRoom|withText" />
+
+        <item android:id="@+id/fff"
+            android:title="FFF"
+            android:icon="@drawable/ic_refresh_black_24dp"
+            android:showAsAction="ifRoom|withText" />
+    -->
+</menu>
