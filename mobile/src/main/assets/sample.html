@@ -79,16 +79,15 @@
             oscObj.setServer(10000, "/hogehoge");
             oscObj.startServer();
             document.getElementById("startserver").setAttribute("disabled", "disabled");
-        });
-        document.addEventListener("onoscmessage", function(event){
-            var received = document.getElementById("dumpText").innerHTML;
-            console.log(received);
-            var arrayReceived = [];
-            if(received!="") {
-                arrayReceived = (received.split("\n")).reverse();
+            oscObj.onoscmessage=function(event){
+                var received = document.getElementById("dumpText").innerHTML;
+                var arrayReceived = [];
+                if(received!="") {
+                    arrayReceived = (received.split("\n")).reverse();
+                }
+                arrayReceived.push(event.detail.addrPattern + " " + event.detail.arguments);
+                document.getElementById("dumpText").innerHTML=(arrayReceived.reverse()).slice(0, 9).join("\n");
             }
-            arrayReceived.push(event.detail.addrPattern + " " + event.detail.arguments);
-            document.getElementById("dumpText").innerHTML=(arrayReceived.reverse()).slice(0, 9).join("\n");
         });
     }
     function errorCallback(msg) {
