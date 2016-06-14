@@ -43,57 +43,57 @@
       <button id="startserver" class="bh">Start Server</button>
     </div>
     <textarea id="dumpText" rows="10" class="dumparea"></textarea>
-    <!--<div id="dump" class="dumparea"></div>-->
 
-    <script type="text/javascript" src="./js/webosc.js"></script>
+    <script type="text/javascript" src="https://rawgit.com/ryoyakawai/WebMusicBrowser/master/mobile/src/main/assets/js/webosc.js"></script>
     <script type="text/javascript">
-    var oscObj;
-    navigator.requestOSCAccess().then(successCallback, errorCallback);
-    function successCallback(access) {
-        oscObj=access;
+    (function() {
+        var oscObj;
+        navigator.requestOSCAccess().then(successCallback, errorCallback);
+        function successCallback(access) {
+            oscObj=access;
 
-        var deviceIP;
-        deviceIP=oscObj.getIPAddress();
-        document.getElementById("ipaddr").innerHTML="Local IP: "+ deviceIP;
-        document.getElementById("targetip").setAttribute("value", deviceIP);
+            var deviceIP;
+            deviceIP=oscObj.getIPAddress();
+            document.getElementById("ipaddr").innerHTML="Local IP: "+ deviceIP;
+            document.getElementById("targetip").setAttribute("value", deviceIP);
 
-        document.getElementById("setClient").addEventListener("mousedown", function(event){
-            var targetIP=document.getElementById("targetip").value;
-            oscObj.setClient(targetIP, 10000);
-            document.getElementById("sendMessage").removeAttribute("disabled");
-            document.getElementById("setClient").setAttribute("disabled", "disabled");
-            document.getElementById("targetip").setAttribute("disabled", "disabled");
-        });
-        document.getElementById("sendMessage").addEventListener("mousedown", function(event){
-            var date=new Date();
-            var ddate=date.getFullYear() + "/" + (date.getMonth()+1) + "/" + date.getDate() 
-            + "_" + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds(); 
-            var ddate1=(date.getMonth()+1) + "/" + date.getDate() 
-            + "_" + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds(); 
-            var arguments=document.getElementById("arguments").value;
-            var values={"addrPattern":"/hogehoge", "arguments":[arguments]};
-            console.log(values);
-            oscObj.send(JSON.stringify(values));
-        });
-        document.getElementById("startserver").addEventListener("mousedown", function(event){
-            oscObj.setServer(10000, "/hogehoge");
-            oscObj.startServer();
-            document.getElementById("startserver").setAttribute("disabled", "disabled");
-            oscObj.onoscmessage=function(event){
-                var received = document.getElementById("dumpText").innerHTML;
-                var arrayReceived = [];
-                if(received!="") {
-                    arrayReceived = (received.split("\n")).reverse();
+            document.getElementById("setClient").addEventListener("mousedown", function(event){
+                var targetIP=document.getElementById("targetip").value;
+                oscObj.setClient(targetIP, 10000);
+                document.getElementById("sendMessage").removeAttribute("disabled");
+                document.getElementById("setClient").setAttribute("disabled", "disabled");
+                document.getElementById("targetip").setAttribute("disabled", "disabled");
+            });
+            document.getElementById("sendMessage").addEventListener("mousedown", function(event){
+                var date=new Date();
+                var ddate=date.getFullYear() + "/" + (date.getMonth()+1) + "/" + date.getDate() 
+                + "_" + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds(); 
+                var ddate1=(date.getMonth()+1) + "/" + date.getDate() 
+                + "_" + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds(); 
+                var arguments=document.getElementById("arguments").value;
+                var values={"addrPattern":"/hogehoge", "arguments":[arguments]};
+                console.log(values);
+                oscObj.send(JSON.stringify(values));
+            });
+            document.getElementById("startserver").addEventListener("mousedown", function(event){
+                oscObj.setServer(10000, "/hogehoge");
+                oscObj.startServer();
+                document.getElementById("startserver").setAttribute("disabled", "disabled");
+                oscObj.onoscmessage=function(event){
+                    var received = document.getElementById("dumpText").innerHTML;
+                    var arrayReceived = [];
+                    if(received!="") {
+                        arrayReceived = (received.split("\n")).reverse();
+                    }
+                    arrayReceived.push(event.detail.addrPattern + " " + event.detail.arguments);
+                    document.getElementById("dumpText").innerHTML=(arrayReceived.reverse()).slice(0, 9).join("\n");
                 }
-                arrayReceived.push(event.detail.addrPattern + " " + event.detail.arguments);
-                document.getElementById("dumpText").innerHTML=(arrayReceived.reverse()).slice(0, 9).join("\n");
-            }
-        });
-    }
-    function errorCallback(msg) {
-        console.error(msg);
-    }
-
+            });
+        }
+        function errorCallback(msg) {
+            console.error(msg);
+        }
+    })();
     </script>
   </script>
 </html>

@@ -60,8 +60,6 @@ public class MainActivity extends AppCompatActivity  {
     private static final String TAG="WebMusicBrowser";
 
     // for OSC
-    //private String targetIP = "192.168.1.67";
-    //private int targetPort = 10000;
     private int listenPort = 10000;
 
     private OSCPortOut sender;
@@ -159,17 +157,6 @@ public class MainActivity extends AppCompatActivity  {
                                     startActivity(googlePlayIntent);    Toast.makeText(MainActivity.this, "Please install this app", Toast.LENGTH_LONG ).show();
                                 }
                                 break;
-/*
-                            case R.id.ddd:
-                                Toast.makeText(MainActivity.this, "You have selected DDD Menu", Toast.LENGTH_SHORT).show();
-                                break;
-                            case R.id.eee:
-                                Toast.makeText(MainActivity.this, "You have selected EEE Menu", Toast.LENGTH_SHORT).show();
-                                break;
-                            case R.id.fff:
-                                Toast.makeText(MainActivity.this, "You have selected FFF Menu", Toast.LENGTH_SHORT).show();
-                                break;
-*/
                         }
                         return true;
                     }
@@ -204,6 +191,7 @@ public class MainActivity extends AppCompatActivity  {
                 // display progress bar
                 ProgressBar progressBar = (ProgressBar) findViewById(R.id.pageLoadingProgressBar);
                 progressBar.setVisibility(View.GONE);
+
             }
 
             @Override
@@ -269,9 +257,6 @@ public class MainActivity extends AppCompatActivity  {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if( requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK){
             String contents = data.getStringExtra("SCAN_RESULT");
-            Log.i(TAG, data.getStringExtra("SCAN_RESULT") + "!!!!!!!!!!!!!!!!!");
-//            TextView t = (TextView)findViewById(id.Text);
-//            t.setText(contents);
             AutoCompleteTextView textView = (AutoCompleteTextView) findViewById(R.id.urlText);
             String url = data.getStringExtra("SCAN_RESULT");
             textView.setText(url);
@@ -394,7 +379,6 @@ public class MainActivity extends AppCompatActivity  {
         } else {
             urlText.setText(url);
         }
-
         hideKeyboard(urlText);
         webView.loadUrl(url);
     }
@@ -505,7 +489,6 @@ public class MainActivity extends AppCompatActivity  {
                 Log.i(TAG, "OSCReceiver has already started Start.");
             }
         }
-
 
         public static void stop() {
             receiver.stopListening();

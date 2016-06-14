@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/WebMusicBrowser.iml" filepath="$PROJECT_DIR$/WebMusicBrowser.iml" />
+      <module fileurl="file://$PROJECT_DIR$/WebMusicBrowser.git.iml" filepath="$PROJECT_DIR$/WebMusicBrowser.git.iml" />
       <module fileurl="file://$PROJECT_DIR$/mobile/mobile.iml" filepath="$PROJECT_DIR$/mobile/mobile.iml" />
       <module fileurl="file://$PROJECT_DIR$/mobilewearcommon/mobilewearcommon.iml" filepath="$PROJECT_DIR$/mobilewearcommon/mobilewearcommon.iml" />
       <module fileurl="file://$PROJECT_DIR$/wear/wear.iml" filepath="$PROJECT_DIR$/wear/wear.iml" />
