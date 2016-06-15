@@ -1,7 +1,8 @@
 # Web Music Browser
 
 Web Music Browser is  the android browser that the useful features, especially around music/art area, which are not standardized by W3C are implemented. 
-At this moment, only "Web OSC" is enabled.
+
+At this moment, "Web OSC" is available.
 
 ###*Web Music Browser targets*
   * Provide APIs that are useful on native platform but not yet implemented in web browser.
