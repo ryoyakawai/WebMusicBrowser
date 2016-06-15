@@ -1,7 +1,7 @@
 # Web Music Browser
 
 Web Music Browser is  the android browser that the useful features, especially around music/art area, which are not standardized by W3C are implemented. 
-At this moment, only "Web OSC" is enabled.
+At this moment, "Web OSC" is available.
 
 ###*Web Music Browser targets*
   * Provide APIs that are useful on native platform but not yet implemented in web browser.
@@ -13,15 +13,14 @@ At this moment, only "Web OSC" is enabled.
   * Web OSC [API](https://docs.google.com/document/d/1ChmdATOgjkT4cAz_JiG76WvSOXrEvBvzr0GB8UpsaRA/edit): Documents for the current Web OSC release
   * Web OSC [SampleCode](https://github.com/ryoyakawai/WebMusicBrowser/blob/master/mobile/src/main/assets/sample.html)
 
-###*!!Caution!!*
+###*!!! Caution !!!*
 This browser is *NOT* taking care of any securities. So please use this at your own risk.
-
-
 
 ###*License*
 See [LICENSE](https://raw.githubusercontent.com/ryoyakawai/WebMusicBrowser/master/LICENSE) for more detail.
 
-Web Music Browser itself is released under the [Apache 2.0 license](LICENSE).
+Web Music Browser is using a few library. So, several licenses are applyed. 
+Web Music Browser itself, however, is released under the [Apache 2.0 license](LICENSE).
 
 ```
 Copyright 2016 Ryoya Kawai.
