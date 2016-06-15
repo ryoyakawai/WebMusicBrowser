@@ -74,7 +74,6 @@ public class MainActivity extends AppCompatActivity  {
     // http://qiita.com/sy_sft_/items/508870dfccfb237d72fd
     private AutoCompleteTextView urlText;
     private static WebView webView;
-    private String defaultURL="http://192.168.1.67/~kawai/tmp/oscclient.html";
     private String defaultLocalURL="file:///android_asset/index.html";
 
     // for auto complete
