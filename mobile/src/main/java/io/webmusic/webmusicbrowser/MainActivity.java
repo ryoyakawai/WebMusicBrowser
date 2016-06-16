@@ -7,12 +7,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.StrictMode;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.PopupMenu;
@@ -52,6 +55,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.*;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javis.wearsyncservice.Constant;
 
@@ -161,7 +166,6 @@ public class MainActivity extends AppCompatActivity  {
                     }
                 });
 
-
             }
         });
 
@@ -197,10 +201,6 @@ public class MainActivity extends AppCompatActivity  {
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 // TODO Auto-generated method stub
                 urlText.setText(url);
-                if(startsWithfile(url)==true) {
-                    urlText = (AutoCompleteTextView) findViewById(R.id.urlText);
-                    urlText.setText(null);
-                }
                 return super.shouldOverrideUrlLoading(view, url);
             }
         });
@@ -310,7 +310,6 @@ public class MainActivity extends AppCompatActivity  {
         return (url.startsWith( "http://" ) || url.startsWith( "https://" ));
     }
 
-
     // Key down event for back button on Android UI
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -321,7 +320,6 @@ public class MainActivity extends AppCompatActivity  {
             int cnt = 1 ;
             for( int i = 1 ; i < len ; i ++ ) {
                 url = list.getItemAtIndex(list.getCurrentIndex()-i).getUrl() ;
-//                if( url.startsWith( "http://" ) || url.startsWith( "https://" ) ) {
                 if(startsWithhttphttps(url)) {
                     urlText.setText(url);
                     break ;

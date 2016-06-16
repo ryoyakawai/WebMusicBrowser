@@ -5,5 +5,7 @@
     <string name="menu_title2">Menu 2</string>
     <string name="settings_toolbar_title">Settings</string>
     <string name="settings_general_tab">Coming Soon.</string>
+    <string name="settings_general_permit_incoming_osc_button">Receive OSC Message</string>
     <string name="settings_blemidi_tab">Coming Soon.</string>
+
 </resources>

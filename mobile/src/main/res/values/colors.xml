@@ -8,4 +8,10 @@
     <color name="settings_toolbar_background">#263238</color>
     <color name="settings_back_icon">#ffffff</color>
     <color name="settings_toolbar_title">#ffffff</color>
+    <color name="list_divider">#dcdcdc</color>
+    <color name="settings_each_title">#000000</color>
+    <color name="settings_switch_colorControlActivated">#009385</color>
+    <color name="settings_switch_colorSwitchThumbNormal">#ececec</color>
+    <color name="settings_switch_colorForeground">#acacac</color>
+
 </resources>
