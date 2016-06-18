@@ -14,7 +14,6 @@ var customObj=osc;
 window.navigator.requestOSCAccess=function(param) {
     
     return new Promise(function(resolve, reject) {
-        console.log(this);
         osc.requestOSCAccess();
         if(typeof osc!="undefined") {
             var ret = {
@@ -28,11 +27,13 @@ window.navigator.requestOSCAccess=function(param) {
                     customObj.send(json);
                 },
                 setServer: function(listenPort, addressPattern) {
-                    customObj.setServer(listenPort, addressPattern);
+                    var status=(customObj.setServer(listenPort, addressPattern)=="true"?true:false);
+                    return status;
                 },
                 startServer: function() {
-                    customObj.startServer();
+                    var status=(customObj.startServer()=="true"?true:false);
                     this.startPassEvent();
+                    return status;
                 },
                 stopServer: function() {
                     customObj.stopServer();

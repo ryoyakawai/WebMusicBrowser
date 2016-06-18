@@ -1,9 +1,12 @@
 package io.webmusic.webmusicbrowser;
 
 import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -13,9 +16,11 @@ import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.os.Handler;
 import android.os.StrictMode;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.PopupMenu;
@@ -70,6 +75,7 @@ public class MainActivity extends AppCompatActivity  {
     private OSCPortOut sender;
     private static OSCPortIn receiver;
 
+
     // UI
     // urlBar
     private RelativeLayout urlBar;
@@ -88,6 +94,9 @@ public class MainActivity extends AppCompatActivity  {
     private SharedPreferences settings;
     private Set<String> history;
 
+    // Receiving OSC msg change from App Settings
+    public static boolean isAcceptReceivingOSCMsg = false;
+
     // for check
     private static boolean isOSCAccessRequested = false;
     private boolean isExistOSCClient = false;
@@ -95,17 +104,23 @@ public class MainActivity extends AppCompatActivity  {
     private static boolean isRunningOSCServer = false;
 
     // for launching qr code reader
-    public static final int REQUEST_CODE = 1;
+    public static final int REQUEST_CODE_QRCODE = 1000;
+    public static final int REQUEST_CODE_SETTINGS = 1001;
+
+    // for dialog
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
         // hide progress bar
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.pageLoadingProgressBar);
         progressBar.setVisibility(View.GONE);
 
+        // for dialog
+        //builder = new AlertDialog.Builder(this);
 
         // urlBar
         urlBar = (RelativeLayout) findViewById(R.id.urlBar);
@@ -144,9 +159,7 @@ public class MainActivity extends AppCompatActivity  {
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.more_vert_settings_setting:
-                                Intent settings = new Intent(MainActivity.this, SettingsActivity.class);
-                                startActivity(settings);
-                                Toast.makeText(MainActivity.this, "You have selected AAA Menu", Toast.LENGTH_SHORT).show();
+                                openSettingsActivity();
                                 break;
                             case R.id.more_vert_settings_refresh:
                                 refreshPageByUrl();
@@ -154,11 +167,12 @@ public class MainActivity extends AppCompatActivity  {
                             case R.id.intent_qrcodereader:
                                 Intent intent = new Intent("com.google.zxing.client.android.SCAN");
                                 try{
-                                    startActivityForResult(intent, REQUEST_CODE);
+                                    startActivityForResult(intent, REQUEST_CODE_QRCODE);
                                 }catch (ActivityNotFoundException e){
                                     Intent googlePlayIntent = new Intent(Intent.ACTION_VIEW);
                                     googlePlayIntent.setData(Uri.parse("https://play.google.com/store/apps/details?id=com.google.zxing.client.android"));
-                                    startActivity(googlePlayIntent);    Toast.makeText(MainActivity.this, "Please install this app", Toast.LENGTH_LONG ).show();
+                                    startActivity(googlePlayIntent);
+                                    Toast.makeText(MainActivity.this, "Please install this app", Toast.LENGTH_LONG ).show();
                                 }
                                 break;
                         }
@@ -243,23 +257,38 @@ public class MainActivity extends AppCompatActivity  {
                 refreshPageByUrl();
             }
         });
+
         // auto complete
         settings = getSharedPreferences(PREFS_NAME, 0);
         history = settings.getStringSet(PREFS_SEARCH_HISTORY, new HashSet<String>());
         setAutoCompleteSource();
 
+
     } // onCreate
 
+
+    public void openSettingsActivity() {
+        Intent settings = new Intent(MainActivity.this, SettingsActivity.class);
+        settings.putExtra("isAcceptReceivingOSCMsg", isAcceptReceivingOSCMsg);
+        int requestCode = REQUEST_CODE_SETTINGS;
+        startActivityForResult(settings, requestCode);
+    }
 
     // action after receive data from intent
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if( requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK){
+        // from QR Code Reader
+        if( requestCode == REQUEST_CODE_QRCODE && resultCode == Activity.RESULT_OK){
             String contents = data.getStringExtra("SCAN_RESULT");
             AutoCompleteTextView textView = (AutoCompleteTextView) findViewById(R.id.urlText);
             String url = data.getStringExtra("SCAN_RESULT");
             textView.setText(url);
             webView.loadUrl(url);
+        }
+        // from Settings Activity
+        if(requestCode == REQUEST_CODE_SETTINGS) {
+            Boolean status = data.getBooleanExtra("isAcceptReceivingOSCMsg", false);
+            isAcceptReceivingOSCMsg = status;
         }
     }
 
@@ -404,6 +433,21 @@ public class MainActivity extends AppCompatActivity  {
         editor.commit();
     }
 
+    // Display permission display
+    public void displayPermissionDialog() {
+        new AlertDialog.Builder(this)
+            .setTitle(R.string.permission_title)
+            .setMessage(R.string.permission_body_01)
+            .setPositiveButton(R.string.permission_button_right, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    openSettingsActivity();
+                }
+            })
+            .setNegativeButton(R.string.permission_button_left, null)
+            .show();
+
+    }
 
     // OSC Client
     public void setOSCClient(String targetIP, int targetPort) {
@@ -424,76 +468,138 @@ public class MainActivity extends AppCompatActivity  {
         }
     }
 
+    public jsOSCReceiver OSCReceiver = new jsOSCReceiver();
+
     // OSC Receiver
-    public static class OSCReceiver {
-        public static void prepare(int listenPort, String addrPattern) {
-            // OSC Server
-            if(isExistOSCServer == false) {
-                try {
-                    receiver = new OSCPortIn(listenPort);
-                    isExistOSCServer = true;
-                } catch (SocketException e) {
-                    e.printStackTrace();
-                    Log.e(TAG, "[Error] while creating receiver.");
-                }
-                // TODO: add message directory and pass to injectParam()
-                OSCListener listener = new OSCListener() {
-                    @Override
-                    public void acceptMessage(Date time, OSCMessage message, String senderAddr) {
-                        injectParam(message.getAddress(), message.getArguments());
-                        Log.i(TAG, "[Reveived] " + time + " :: " + message.getArguments() + " :: " + message.getAddress() + " :: " + senderAddr);
+/*
+    final Handler handler = new Handler();
+    handler.post(new Runnable() {
+        @Override
+        public void run() {
+            displayPermissionDialog();
+
+        }
+    });
+*/
+
+    public class jsOSCReceiver {
+        public Boolean prepare(final int listenPort, final String addrPattern) {
+            Boolean status=false;
+            status=false;
+            if(isAcceptReceivingOSCMsg==false) {
+                displayPermissionDialog();
+            } else {
+                // OSC Server
+                if (isExistOSCServer == false) {
+                    try {
+                        receiver = new OSCPortIn(listenPort);
+                        isExistOSCServer = true;
+                    } catch (SocketException e) {
+                        e.printStackTrace();
+                        Log.e(TAG, "[Error] while creating receiver.");
                     }
-                };
-                receiver.addListener(addrPattern, listener);
+                    // TODO: add message directory and pass to injectParam()
+                    webView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            //displayPermissionDialog();
+                            OSCListener listener = new OSCListener() {
+                                @Override
+                                public void acceptMessage(Date time, OSCMessage message, String senderAddr) {
+                                    if(isAcceptReceivingOSCMsg==true) {
+                                        Gson gson = new Gson();
+                                        String Arguments = gson.toJson(message.getArguments());
+                                        Map<String, String> params = new HashMap<String, String>();
+                                        params.put("addrPattern", message.getAddress());
+                                        params.put("arguments", Arguments);
+                                        injectParam("onoscmessage", params);
+                                        Log.i(TAG, "[Reveived] " + time + " :: " + message.getArguments() + " :: " + message.getAddress() + " :: " + senderAddr);
+                                    } else {
+                                        webView.post(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                displayPermissionDialog();
+                                            }
+                                        });
+                                    }
+                                }
+                            };
+                            receiver.addListener(addrPattern, listener);
+
+                        }
+                    });
+
+                }
+                Log.i(TAG, "OSCReceiver prepared. [AddressPattern] " + addrPattern);
+                status=true;
             }
-            Log.i(TAG, "OSCReceiver prepared. [AddressPattern] " + addrPattern);
+
+            return status;
+
         }
 
         // http://stackoverflow.com/questions/22607657/webview-methods-on-same-thread-error
-        public static void injectParam(final String addrPattern, final Object arguments) {
+        public void injectParam(final String type, final Map params) {
             webView.post(new Runnable(){
                 @Override
                 public void run() {
-                    Gson gson = new Gson();
-                    String json = gson.toJson(arguments);
-                    // CustomEvent
-                    // https://www.sitepoint.com/javascript-custom-events/
-                    webView.loadUrl(
-                            "javascript:(function() { " +
-                                    "var event = new CustomEvent('onoscmessage', {" +
-                                    "   detail: {" +
-                                    "     addrPattern: '" + addrPattern + "'," +
-                                    "     arguments: " + json + "," +
-                                    "     time: new Date()," +
-                                    "    }," +
-                                    "    bubbles: true," +
-                                    "    cancelable: true" +
-                                    "});" +
-                                    "document.dispatchEvent(event);" +
-                            "})()");
+                    String eventName = null;
+                    String detail = null;
 
-                    Log.i(TAG,"[Inject Param]"+json);
+                    switch(type) {
+                    case "onoscmessage":
+                        eventName = "onoscmessage";
+                        detail =
+                            "   detail: {" +
+                            "     addrPattern: '" + params.get("addrPattern") + "'," +
+                            "     arguments: " + params.get("arguments") + "," +
+                            "     time: new Date()," +
+                            "    }";
+                        break;
+                    }
+                    if(eventName!=null && detail!=null) {
+                        // CustomEvent
+                        // https://www.sitepoint.com/javascript-custom-events/
+                        webView.loadUrl(
+                                        "javascript:(function() { " +
+                                        "var event = new CustomEvent('"+eventName+"', {" +
+                                        detail + "," +
+                                        "    bubbles: true," +
+                                        "    cancelable: true" +
+                                        "});" +
+                                        "document.dispatchEvent(event);" +
+                                        "})()");
+                    } else {
+                        Log.e(TAG, "[fetal:injectParam] eventName and/or detail are not specified.");
+                    }
                 }
             });
         }
 
-        public static void start() {
-            if(isRunningOSCServer == false) {
+        public boolean start() {
+            Boolean result=false;
+            if(isAcceptReceivingOSCMsg==false) {
+                displayPermissionDialog();
+                result=false;
+            } else if(!isRunningOSCServer) {
                 receiver.startListening();
                 isRunningOSCServer = true;
                 Log.i(TAG, "OSCReceiver has Start.");
+                result=true;
             } else {
                 Log.i(TAG, "OSCReceiver has already started Start.");
             }
+            return result;
         }
 
-        public static void stop() {
+        public void stop() {
             receiver.stopListening();
             isRunningOSCServer = false;
             Log.i(TAG, "Receiver Stop!!");
         }
 
     }
+
 
     private OSCMessage createOSCMessage(String OSCAddr, Object OSCArgument) {
         return new OSCMessage(OSCAddr, Arrays.asList(OSCArgument));
@@ -612,27 +718,36 @@ public class MainActivity extends AppCompatActivity  {
         }
 
         @JavascriptInterface
-        public void setServer(int vServerPort, String vAddrPattern) {
+        public String setServer(int vServerPort, String vAddrPattern) {
+            Boolean status = false;
             if(isOSCAccessRequested == true) {
-                OSCReceiver.prepare(vServerPort, vAddrPattern);
-                serverPort = vServerPort;
-                addrPattern = vAddrPattern;
+                if(OSCReceiver.prepare(vServerPort, vAddrPattern)==true) {
+                    serverPort = vServerPort;
+                    addrPattern = vAddrPattern;
+                    status=true;
+                } else {
+                    status=false;
+                }
             } else {
                 Log.i("TAG", "requestOSCAccess() must be called to use " + trace.getMethodName() + " method.");
+                status=false;
             }
+            return String.valueOf(status);
         }
 
         @JavascriptInterface
-        public void startServer() {
+        public String startServer() {
+            Boolean status=false;
             if(isOSCAccessRequested == true) {
                 if(isExistOSCServer == true) {
-                    OSCReceiver.start();
+                    status=OSCReceiver.start();
                 } else {
                     Log.i("TAG", "setServer() must be called to use " + trace.getMethodName() + " method.");
                 }
             } else {
                 Log.i("TAG", "requestOSCAccess() must be called to use " + trace.getMethodName() + " method.");
             }
+            return String.valueOf(status);
         }
 
         @JavascriptInterface

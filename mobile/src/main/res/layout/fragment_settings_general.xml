@@ -1,5 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment_setting_general_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".SettingsGeneralFragment">
@@ -32,7 +33,7 @@
                 android:layout_marginRight="16dp"
                 android:gravity="center_vertical|center_horizontal|right">
                 <android.support.v7.widget.SwitchCompat
-                    android:id="@+id/toggle"
+                    android:id="@+id/switch_accept_receive_osc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="false"/>

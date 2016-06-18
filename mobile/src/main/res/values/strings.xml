@@ -7,5 +7,9 @@
     <string name="settings_general_tab">Coming Soon.</string>
     <string name="settings_general_permit_incoming_osc_button">Receive OSC Message</string>
     <string name="settings_blemidi_tab">Coming Soon.</string>
+    <string name="permission_title">Interaction Requested</string>
+    <string name="permission_body_01">To start interacting, update \"Receive OSC Message\" flag.</string>
+    <string name="permission_button_left">CANCEL</string>
+    <string name="permission_button_right">UPDATE</string>
 
 </resources>
