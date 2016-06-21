@@ -107,7 +107,6 @@ public class MainActivity extends AppCompatActivity  {
     public static final int REQUEST_CODE_QRCODE = 1000;
     public static final int REQUEST_CODE_SETTINGS = 1001;
 
-    // for dialog
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -191,7 +190,7 @@ public class MainActivity extends AppCompatActivity  {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 // TODO Auto-generated method stub
-                Log.i(TAG, "[WebView] Start Loading: "+url);
+                Logger.o("i", TAG, "[WebView] Start Loading: "+url);
                 super.onPageStarted(view, url, favicon);
 
                 // display progress bar
@@ -202,7 +201,7 @@ public class MainActivity extends AppCompatActivity  {
             @Override
             public void onPageFinished(WebView view, String url) {
                 // TODO Auto-generated method stub
-                Log.i(TAG, "[WebView] Finished Loading: "+url);
+                Logger.o("i", TAG, "[WebView] Finished Loading: "+url);
                 super.onPageFinished(view, url);
 
                 // display progress bar
@@ -298,7 +297,7 @@ public class MainActivity extends AppCompatActivity  {
         public void onReceive(Context c, Intent intent) {
             if (intent.getAction().equals(Constant.MY_INTENT_FILTER)) {
                 //textView.setText(intent.getStringExtra(Constant.PHONE_TO_WATCH_TEXT));
-                Log.i(TAG, intent.getStringExtra(Constant.PHONE_TO_WATCH_TEXT));
+                Logger.o("i", TAG, "[onReceive()] "+ intent.getStringExtra(Constant.PHONE_TO_WATCH_TEXT));
             }
         }
     };
@@ -406,6 +405,24 @@ public class MainActivity extends AppCompatActivity  {
             urlText.setText(url);
         }
         hideKeyboard(urlText);
+        try {
+            sender.close();
+            Logger.o("i", TAG, "sender closed");
+        } catch(Exception e) {
+            Logger.o("i", TAG, "ERROR: sender");
+        }
+        try {
+            receiver.close();
+            Logger.o("i", TAG, "receiver closed");
+        } catch(Exception e) {
+            Logger.o("i", TAG, "ERROR: receiver");
+        }
+        isOSCAccessRequested = false;
+        isExistOSCClient = false;
+        isExistOSCServer = false;
+        isRunningOSCServer = false;
+        //webView.removeJavascriptInterface("osc");
+        //webView.addJavascriptInterface(new WebOSCInterface(MainActivity.this), "osc");
         webView.loadUrl(url);
     }
 
@@ -458,34 +475,23 @@ public class MainActivity extends AppCompatActivity  {
                 isExistOSCClient = true;
             } catch (SocketException e) {
                 e.printStackTrace();
-                Log.e(TAG, "[Error] SocketException occurred while creating client.");
+                Logger.o("e", TAG, "[Error] SocketException occurred while creating client.");
             } catch (UnknownHostException e) {
                 e.printStackTrace();
-                Log.e(TAG, "[Error] UnknownException occurred while creating client.");
+                Logger.o("e", TAG, "[Error] UnknownException occurred while creating client.");
             }
         } else {
-            Log.i(TAG, "OSC Client already exist.");
+            Logger.o("i", TAG, "OSC Client already exist.");
         }
     }
 
     public jsOSCReceiver OSCReceiver = new jsOSCReceiver();
-
     // OSC Receiver
-/*
-    final Handler handler = new Handler();
-    handler.post(new Runnable() {
-        @Override
-        public void run() {
-            displayPermissionDialog();
-
-        }
-    });
-*/
-
     public class jsOSCReceiver {
         public Boolean prepare(final int listenPort, final String addrPattern) {
             Boolean status=false;
             status=false;
+            Logger.o("e", TAG, isAcceptReceivingOSCMsg +" :: "+isExistOSCServer + " :: ");
             if(isAcceptReceivingOSCMsg==false) {
                 displayPermissionDialog();
             } else {
@@ -494,9 +500,10 @@ public class MainActivity extends AppCompatActivity  {
                     try {
                         receiver = new OSCPortIn(listenPort);
                         isExistOSCServer = true;
+                        Logger.o("e", TAG, isAcceptReceivingOSCMsg +" :: "+isExistOSCServer + " :: ");
                     } catch (SocketException e) {
                         e.printStackTrace();
-                        Log.e(TAG, "[Error] while creating receiver.");
+                        Logger.o("e", TAG, "[Error] while creating receiver.");
                     }
                     // TODO: add message directory and pass to injectParam()
                     webView.post(new Runnable() {
@@ -513,7 +520,7 @@ public class MainActivity extends AppCompatActivity  {
                                         params.put("addrPattern", message.getAddress());
                                         params.put("arguments", Arguments);
                                         injectParam("onoscmessage", params);
-                                        Log.i(TAG, "[Reveived] " + time + " :: " + message.getArguments() + " :: " + message.getAddress() + " :: " + senderAddr);
+                                        Logger.o("i", TAG, "[Reveived] " + time + " :: " + message.getArguments() + " :: " + message.getAddress() + " :: " + senderAddr);
                                     } else {
                                         webView.post(new Runnable() {
                                             @Override
@@ -530,7 +537,7 @@ public class MainActivity extends AppCompatActivity  {
                     });
 
                 }
-                Log.i(TAG, "OSCReceiver prepared. [AddressPattern] " + addrPattern);
+                Logger.o("i", TAG, "OSCReceiver prepared. [AddressPattern] " + addrPattern);
                 status=true;
             }
 
@@ -570,7 +577,7 @@ public class MainActivity extends AppCompatActivity  {
                                         "document.dispatchEvent(event);" +
                                         "})()");
                     } else {
-                        Log.e(TAG, "[fetal:injectParam] eventName and/or detail are not specified.");
+                        Logger.o("e", TAG, "[fetal:injectParam] eventName and/or detail are not specified.");
                     }
                 }
             });
@@ -581,13 +588,13 @@ public class MainActivity extends AppCompatActivity  {
             if(isAcceptReceivingOSCMsg==false) {
                 displayPermissionDialog();
                 result=false;
-            } else if(!isRunningOSCServer) {
+            } else if(isRunningOSCServer==false) {
                 receiver.startListening();
                 isRunningOSCServer = true;
-                Log.i(TAG, "OSCReceiver has Start.");
+                Logger.o("i", TAG, "OSCReceiver starting.");
                 result=true;
             } else {
-                Log.i(TAG, "OSCReceiver has already started Start.");
+                Logger.o("i", TAG, "OSCReceiver has already started.");
             }
             return result;
         }
@@ -595,7 +602,7 @@ public class MainActivity extends AppCompatActivity  {
         public void stop() {
             receiver.stopListening();
             isRunningOSCServer = false;
-            Log.i(TAG, "Receiver Stop!!");
+            Logger.o("i", TAG, "Receiver Stop!!");
         }
 
     }
@@ -645,7 +652,7 @@ public class MainActivity extends AppCompatActivity  {
                     ipAddr = ((ipAddrInt >> 0) & 0xFF) + "." + ((ipAddrInt >> 8) & 0xFF) + "." + ((ipAddrInt >> 16) & 0xFF) + "." + ((ipAddrInt >> 24) & 0xFF);
                 }
             } else {
-                Log.i("TAG", "requestOSCAccess() must be called to use " + trace.getMethodName() + " method.");
+                Logger.o("i", TAG, "requestOSCAccess() must be called to use " + trace.getMethodName() + " method.");
             }
             return ipAddr;
         }
@@ -658,14 +665,13 @@ public class MainActivity extends AppCompatActivity  {
         }
 
         @JavascriptInterface
-        public void setClient(String vTargetIP, int vTargetPort) {
+        public void setClient(String TargetIP, int TargetPort) {
+            Logger.o("e", TAG, String.valueOf(isOSCAccessRequested));
             if(isOSCAccessRequested == true) {
-                setOSCClient(vTargetIP, vTargetPort);
-                vTargetIP = targetIP;
-                vTargetPort = targetPort;
-                Log.i("TAG", "Client is set on IP: " + vTargetIP + ", Port: "+ vTargetPort +".");
+                setOSCClient(TargetIP, TargetPort);
+                Logger.o("i", TAG, "Client is set on IP: " + TargetIP + ", Port: "+ TargetPort +".");
             } else {
-                Log.i("TAG", "requestOSCAccess() must be called to use " + trace.getMethodName() + " method.");
+                Logger.o("i", TAG, "requestOSCAccess() must be called to use " + trace.getMethodName() + " method.");
             }
         }
 
@@ -673,7 +679,7 @@ public class MainActivity extends AppCompatActivity  {
         public void send(String json) {
             if(isOSCAccessRequested == true) {
                 if(isExistOSCClient==true) {
-                    Log.i(TAG, json);
+                    Logger.o("i", TAG, "send() " + json);
                     String addrPattern = null;
                     JSONObject params = null;
                     JSONArray arguments = null;
@@ -710,26 +716,24 @@ public class MainActivity extends AppCompatActivity  {
                     }
                     sendOSCMsg(new OSCMessage(addrPattern, Arrays.asList(OSCValues)));
                 } else {
-                    Log.i("TAG", "setClient() must be called to use " + trace.getMethodName() + " method.");
+                    Logger.o("i", TAG, "setClient() must be called to use " + trace.getMethodName() + " method.");
                 }
             } else {
-                Log.i("TAG", "requestOSCAccess() must be called to use " + trace.getMethodName() + " method.");
+                Logger.o("i", TAG, "requestOSCAccess() must be called to use " + trace.getMethodName() + " method.");
             }
         }
 
         @JavascriptInterface
-        public String setServer(int vServerPort, String vAddrPattern) {
+        public String setServer(int ServerPort, String AddrPattern) {
             Boolean status = false;
             if(isOSCAccessRequested == true) {
-                if(OSCReceiver.prepare(vServerPort, vAddrPattern)==true) {
-                    serverPort = vServerPort;
-                    addrPattern = vAddrPattern;
+                if(OSCReceiver.prepare(ServerPort, AddrPattern)==true) {
                     status=true;
                 } else {
                     status=false;
                 }
             } else {
-                Log.i("TAG", "requestOSCAccess() must be called to use " + trace.getMethodName() + " method.");
+                Logger.o("i", TAG, "requestOSCAccess() must be called to use " + trace.getMethodName() + " method.");
                 status=false;
             }
             return String.valueOf(status);
@@ -742,10 +746,10 @@ public class MainActivity extends AppCompatActivity  {
                 if(isExistOSCServer == true) {
                     status=OSCReceiver.start();
                 } else {
-                    Log.i("TAG", "setServer() must be called to use " + trace.getMethodName() + " method.");
+                    Logger.o("i", TAG, "setServer() must be called to use " + trace.getMethodName() + " method.");
                 }
             } else {
-                Log.i("TAG", "requestOSCAccess() must be called to use " + trace.getMethodName() + " method.");
+                Logger.o("i", TAG, "requestOSCAccess() must be called to use " + trace.getMethodName() + " method.");
             }
             return String.valueOf(status);
         }
@@ -756,10 +760,10 @@ public class MainActivity extends AppCompatActivity  {
                 if(isExistOSCServer == true) {
                     OSCReceiver.stop();
                 } else {
-                    Log.i("TAG", "setServer() must be called to use " + trace.getMethodName() + " method.");
+                    Logger.o("i", TAG, "setServer() must be called to use " + trace.getMethodName() + " method.");
                 }
             } else {
-                Log.i("TAG", "requestOSCAccess() must be called to use " + trace.getMethodName() + " method.");
+                Logger.o("i", TAG, "requestOSCAccess() must be called to use " + trace.getMethodName() + " method.");
             }
         }
     }

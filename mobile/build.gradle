@@ -19,8 +19,8 @@ android {
         applicationId "io.webmusic.webmusicbrowser"
         minSdkVersion 21
         targetSdkVersion 23
-        versionCode 3
-        versionName "0.7.1"
+        versionCode 5
+        versionName "0.7.3"
 
         // Enabling multidex support.
         multiDexEnabled true
