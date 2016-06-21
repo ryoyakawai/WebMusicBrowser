@@ -15,9 +15,6 @@ The app is available on Google Play. (Click Google Play icon to visit app site)
   * Web OSC [API](https://docs.google.com/document/d/1ChmdATOgjkT4cAz_JiG76WvSOXrEvBvzr0GB8UpsaRA/edit): Documents for the current Web OSC release
   * Web OSC [SampleCode](https://github.com/ryoyakawai/WebMusicBrowser/blob/master/mobile/src/main/assets/sample.html)
 
-###*!!! Caution !!!*
-This browser is *NOT* taking care of any securities. So please use this at your own risk.
-
 ###*License*
 See [LICENSE](https://raw.githubusercontent.com/ryoyakawai/WebMusicBrowser/master/LICENSE) for more detail.
 
