@@ -43,6 +43,9 @@ public class SettingsActivity extends AppCompatActivity implements SettingsGener
     private static boolean isAcceptReceivingOSCMsg = false;
 
     //
+    private static ArrayList<String> IPWhiteList = new ArrayList<>();
+
+    //
     Intent intent;
 
     /**
@@ -81,6 +84,9 @@ public class SettingsActivity extends AppCompatActivity implements SettingsGener
         // receive value from activity
         Intent intent = getIntent();
         isAcceptReceivingOSCMsg = intent.getBooleanExtra("isAcceptReceivingOSCMsg", false);
+        IPWhiteList = intent.getStringArrayListExtra("IPWhiteList");
+
+        Logger.o("e", TAG, "[reveive] "+String.valueOf(isAcceptReceivingOSCMsg) + " [IPWhiteList] " + String.valueOf(IPWhiteList));
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -90,6 +96,7 @@ public class SettingsActivity extends AppCompatActivity implements SettingsGener
     public void backToMainActivity() {
         intent = new Intent();
         intent.putExtra("isAcceptReceivingOSCMsg", isAcceptReceivingOSCMsg);
+        intent.putExtra("IPWhiteList", IPWhiteList);
         setResult(RESULT_OK, intent);
         finish();
     }
@@ -104,9 +111,18 @@ public class SettingsActivity extends AppCompatActivity implements SettingsGener
     }
 
     @Override
+    public boolean getAcceptStatus() { return isAcceptReceivingOSCMsg; }
+
+    @Override
     public void updateAcceptStatus(boolean status) {
         isAcceptReceivingOSCMsg = status;
     }
+
+    @Override
+    public ArrayList getIPWhiteList() { return IPWhiteList; }
+
+    @Override
+    public void deleteOneIPWhiteList(String IP) { IPWhiteList.remove(IP);}
 
     private void setupViewPager(ViewPager viewPager) {
         // pass value to fragment

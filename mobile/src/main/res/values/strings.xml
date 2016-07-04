@@ -5,11 +5,17 @@
     <string name="menu_title2">Menu 2</string>
     <string name="settings_toolbar_title">Settings</string>
     <string name="settings_general_tab">Coming Soon.</string>
-    <string name="settings_general_permit_incoming_osc_button">Receive OSC Message</string>
+    <string name="settings_general_permit_incoming_osc_button">Receive Message</string>
+    <string name="settings_general_permit_incoming_iplist_button">Accepted IP List</string>
+    <string name="settings_general_permit_incoming_iplist_button_text">View</string>
     <string name="settings_blemidi_tab">Coming Soon.</string>
-    <string name="permission_title">Interaction Requested</string>
-    <string name="permission_body_01">To start interacting, update \"Receive OSC Message\" flag.</string>
-    <string name="permission_button_left">CANCEL</string>
-    <string name="permission_button_right">UPDATE</string>
-
+    <string name="permission_title_01">Permission Request</string>
+    <string name="permission_title_02">Interaction Request</string>
+    <string name="permission_body_01">Allow this app to receive incoming messages.\n\nOpen [Settings] > [Receive Message] for changing the state.</string>
+    <string name="permission_body_02">Accept incoming message from \"%s\".</string>
+    <string name="permission_button_left">DECLINE</string>
+    <string name="permission_button_right_01">UPDATE</string>
+    <string name="permission_button_right_02">ACCEPT</string>
+    <string name="permission_context_menu_delete_ip_title">Click to reject "Accepted IP"</string>
+    <string name="permission_context_menu_delete_ip_is_zero">No IPs have accepted yet.</string>
 </resources>

@@ -75,7 +75,6 @@ public class MainActivity extends AppCompatActivity  {
     private OSCPortOut sender;
     private static OSCPortIn receiver;
 
-
     // UI
     // urlBar
     private RelativeLayout urlBar;
@@ -96,6 +95,9 @@ public class MainActivity extends AppCompatActivity  {
 
     // Receiving OSC msg change from App Settings
     public static boolean isAcceptReceivingOSCMsg = false;
+
+    // white list
+    public static ArrayList<String> IPWhiteList = new ArrayList<>();
 
     // for check
     private static boolean isOSCAccessRequested = false;
@@ -269,6 +271,7 @@ public class MainActivity extends AppCompatActivity  {
     public void openSettingsActivity() {
         Intent settings = new Intent(MainActivity.this, SettingsActivity.class);
         settings.putExtra("isAcceptReceivingOSCMsg", isAcceptReceivingOSCMsg);
+        settings.putExtra("IPWhiteList", IPWhiteList);
         int requestCode = REQUEST_CODE_SETTINGS;
         startActivityForResult(settings, requestCode);
     }
@@ -286,8 +289,8 @@ public class MainActivity extends AppCompatActivity  {
         }
         // from Settings Activity
         if(requestCode == REQUEST_CODE_SETTINGS) {
-            Boolean status = data.getBooleanExtra("isAcceptReceivingOSCMsg", false);
-            isAcceptReceivingOSCMsg = status;
+            isAcceptReceivingOSCMsg = data.getBooleanExtra("isAcceptReceivingOSCMsg", false);
+            IPWhiteList = data.getStringArrayListExtra("IPWhiteList");
         }
     }
 
@@ -451,14 +454,27 @@ public class MainActivity extends AppCompatActivity  {
     }
 
     // Display permission display
-    public void displayPermissionDialog() {
+    public void displayPermissionDialog(final String senderIP) {
+        String title=getString(R.string.permission_title_01);
+        String message=getString(R.string.permission_body_01);
+        String buttonRight=getString(R.string.permission_button_right_02);
+        if(senderIP!=null && !IPWhiteList.contains(senderIP)) {
+            title=getString(R.string.permission_title_02);
+            message=getString(R.string.permission_body_02, senderIP);
+            buttonRight=getString(R.string.permission_button_right_02);
+        }
+
         new AlertDialog.Builder(this)
-            .setTitle(R.string.permission_title)
-            .setMessage(R.string.permission_body_01)
-            .setPositiveButton(R.string.permission_button_right, new DialogInterface.OnClickListener() {
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton(buttonRight, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    openSettingsActivity();
+                    IPWhiteList.removeAll(Collections.singleton(null));
+                    if(IPWhiteList.contains(senderIP)!=true) IPWhiteList.add(senderIP);
+                    Logger.o("e", TAG, String.valueOf(IPWhiteList));
+                    isAcceptReceivingOSCMsg=true;
+                    //openSettingsActivity();
                 }
             })
             .setNegativeButton(R.string.permission_button_left, null)
@@ -493,7 +509,7 @@ public class MainActivity extends AppCompatActivity  {
             status=false;
             Logger.o("e", TAG, isAcceptReceivingOSCMsg +" :: "+isExistOSCServer + " :: ");
             if(isAcceptReceivingOSCMsg==false) {
-                displayPermissionDialog();
+                displayPermissionDialog(null);
             } else {
                 // OSC Server
                 if (isExistOSCServer == false) {
@@ -512,20 +528,24 @@ public class MainActivity extends AppCompatActivity  {
                             //displayPermissionDialog();
                             OSCListener listener = new OSCListener() {
                                 @Override
-                                public void acceptMessage(Date time, OSCMessage message, String senderAddr) {
-                                    if(isAcceptReceivingOSCMsg==true) {
+                                public void acceptMessage(final Date time, final OSCMessage message, final String senderAddr) {
+                                    final String senderIP=(((senderAddr.replace("/", "")).split(":"))[0]).trim();
+                                    if(isAcceptReceivingOSCMsg==true
+                                       && IPWhiteList.contains(senderIP)==true) {
                                         Gson gson = new Gson();
                                         String Arguments = gson.toJson(message.getArguments());
                                         Map<String, String> params = new HashMap<String, String>();
                                         params.put("addrPattern", message.getAddress());
                                         params.put("arguments", Arguments);
                                         injectParam("onoscmessage", params);
-                                        Logger.o("i", TAG, "[Reveived] " + time + " :: " + message.getArguments() + " :: " + message.getAddress() + " :: " + senderAddr);
+                                        Logger.o("i", TAG, "[IPWhiteList] " + String.valueOf(IPWhiteList));
+                                        Logger.o("i", TAG, "[Reveived] " + time + " :: " + message.getArguments() + " :: " + message.getAddress() + " :: " + senderIP);
                                     } else {
                                         webView.post(new Runnable() {
                                             @Override
                                             public void run() {
-                                                displayPermissionDialog();
+                                                Logger.o("i", TAG, "[Reveived] " + time + " :: " + message.getArguments() + " :: " + message.getAddress() + " :: " + senderIP);
+                                                displayPermissionDialog(senderIP);
                                             }
                                         });
                                     }
@@ -586,7 +606,7 @@ public class MainActivity extends AppCompatActivity  {
         public boolean start() {
             Boolean result=false;
             if(isAcceptReceivingOSCMsg==false) {
-                displayPermissionDialog();
+                displayPermissionDialog(null);
                 result=false;
             } else if(isRunningOSCServer==false) {
                 receiver.startListening();

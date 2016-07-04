@@ -36,10 +36,14 @@
                     android:id="@+id/switch_accept_receive_osc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:checked="false"/>
+                    android:checked="false"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="37dp" />
             </RelativeLayout>
         </LinearLayout>
 
+<!--
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -52,9 +56,65 @@
                 android:src="@drawable/list_divider"
                 android:scaleType="fitXY"
                 android:gravity="fill_horizontal"
+                android:layout_marginLeft="36dp"
+                android:layout_marginRight="10dp"/>
+        </LinearLayout>
+-->
+
+        <LinearLayout android:id="@+id/white_list_block"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:orientation="horizontal"
+            android:layout_gravity="center_horizontal"
+            android:layout_below="@+id/accept_osc_block">
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="66dp"
+                android:gravity="center_vertical|left|top">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="48dp"
+                    android:text="@string/settings_general_permit_incoming_iplist_button"
+                    android:textSize="16dp"
+                    android:textColor="@color/settings_each_title"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentStart="true" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:layout_marginRight="16dp"
+                android:gravity="center_vertical|center_horizontal|right">
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/button_accept_iplist_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="false"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="37dp"
+                    android:text="@string/settings_general_permit_incoming_iplist_button_text" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:orientation="horizontal"
+            android:layout_gravity="center_horizontal"
+            android:layout_below="@id/white_list_block">
+            <ImageView android:id="@+id/titleDivider02"
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:src="@drawable/list_divider"
+                android:scaleType="fitXY"
+                android:gravity="fill_horizontal"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"/>
         </LinearLayout>
+
     </RelativeLayout>
 
     <!--<RelativeLayout
