@@ -5,17 +5,17 @@ Web Music Browser is  the android browser that the useful features, especially a
 The app is available on Google Play. (Click Google Play icon to visit app site)   
 <a href="https://play.google.com/store/apps/details?id=io.webmusic.webmusicbrowser" target="_blank"><img src="https://play.google.com/intl/en_us/badges/images/badge_new.png"></a>
 
-###*Web Music Browser targets*
+### Web Music Browser targets
   * Provide APIs that are useful on native platform but not yet implemented in web browser.
   * Provide sandbox to developers to use these APIs.
   * To see whether the APIs is really useful.
   * Improve web platform as music/art platform. 
 
-###*Web Music Browser Documentation*
+### Web Music Browser Documentation
   * Web OSC [API](https://docs.google.com/document/d/1ChmdATOgjkT4cAz_JiG76WvSOXrEvBvzr0GB8UpsaRA/edit): Documents for the current Web OSC release
   * Web OSC [SampleCode](https://github.com/ryoyakawai/WebMusicBrowser/blob/master/mobile/src/main/assets/sample.html)
 
-###*License*
+### License
 See [LICENSE](https://raw.githubusercontent.com/ryoyakawai/WebMusicBrowser/master/LICENSE) for more detail.
 
 Web Music Browser is using a few library. So, several licenses are applyed. 
